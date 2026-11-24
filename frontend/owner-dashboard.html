@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Owner Dashboard — StayFinder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .modal-overlay { display: none; }
+    .modal-overlay.active { display: flex; }
+
+    .image-preview-box {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .image-preview-box img {
+      width: 100%;
+      height: 80px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--gray-200);
+    }
+
+    .amenity-checklist {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .amenity-check {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+
+    .amenity-check input { accent-color: var(--primary); }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar__inner">
+      <a href="index.html" class="navbar__logo">
+        <div class="navbar__logo-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+          </svg>
+        </div>
+        Stay<span>Finder</span>
+      </a>
+      <div class="navbar__actions" id="navbar-actions"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="dashboard-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__user">
+      <div class="sidebar__user-avatar" id="sidebar-avatar">O</div>
+      <div class="sidebar__user-name" id="sidebar-name">Owner</div>
+      <div class="sidebar__user-role">Property Owner</div>
+    </div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__nav-label">Dashboard</div>
+      <a class="sidebar__nav-link active" onclick="showSection('overview', this)">🏠 Overview</a>
+      <a class="sidebar__nav-link" onclick="showSection('listings', this)">📋 My Listings</a>
+      <a class="sidebar__nav-link" onclick="showSection('enquiries', this)">📩 Enquiries</a>
+
+      <div class="sidebar__nav-label" style="margin-top:1rem;">Account</div>
+      <a class="sidebar__nav-link" onclick="showSection('profile', this)">👤 Profile</a>
+      <a href="explore.html" class="sidebar__nav-link">🔍 View Site</a>
+      <a class="sidebar__nav-link" onclick="handleLogout()" style="color:#EF4444;">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="dashboard-main">
+
+    <!-- OVERVIEW -->
+    <div id="section-overview">
+      <h2 style="margin-bottom:0.5rem;" id="welcome-msg">Welcome back! 👋</h2>
+      <p class="text-muted text-sm" style="margin-bottom:2rem;">Here's an overview of your property listings.</p>
+
+      <div class="grid grid-cols-4 gap-4" style="margin-bottom:2rem;">
+        <div class="stat-card">
+          <div class="stat-card__icon blue"><span style="font-size:1.3rem;">🏠</span></div>
+          <div>
+            <div class="stat-card__value" id="stat-total">0</div>
+            <div class="stat-card__label">Total Listings</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon green"><span style="font-size:1.3rem;">✅</span></div>
+          <div>
+            <div class="stat-card__value" id="stat-approved">0</div>
+            <div class="stat-card__label">Approved</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon yellow"><span style="font-size:1.3rem;">⏳</span></div>
+          <div>
+            <div class="stat-card__value" id="stat-pending">0</div>
+            <div class="stat-card__label">Pending</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon red"><span style="font-size:1.3rem;">📩</span></div>
+          <div>
+            <div class="stat-card__value" id="stat-enqs">0</div>
+            <div class="stat-card__label">Enquiries</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div class="table-header">
+          <h3 style="font-size:1rem;">Quick Actions</h3>
+        </div>
+        <div style="padding:1.5rem; display:flex; gap:1rem; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="openAddPropertyModal()">+ Add New Property</button>
+          <button class="btn btn-secondary" onclick="showSection('listings', null)">📋 View Listings</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY LISTINGS -->
+    <div id="section-listings" style="display:none;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h2 style="margin-bottom:0.25rem;">My Property Listings</h2>
+          <p class="text-muted text-sm">Manage your listed properties</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddPropertyModal()">+ Add Property</button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Type</th>
+              <th>Rent/Month</th>
+              <th>Status</th>
+              <th>Availability</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="listings-body">
+            <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray-400)">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ENQUIRIES -->
+    <div id="section-enquiries" style="display:none;">
+      <h2 style="margin-bottom:0.5rem;">Student Enquiries</h2>
+      <p class="text-muted text-sm" style="margin-bottom:1.5rem;">Students who enquired about your properties</p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Property</th>
+              <th>Phone</th>
+              <th>Message</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="enq-body">
+            <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray-400)">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="section-profile" style="display:none;">
+      <h2 style="margin-bottom:0.5rem;">My Profile</h2>
+      <p class="text-muted text-sm" style="margin-bottom:2rem;">Update your account details</p>
+      <div style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-lg); padding:2rem; max-width:540px;">
+        <div id="profile-alert"></div>
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" id="prof-name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" class="form-input" id="prof-phone">
+          </div>
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" class="form-input" id="prof-city">
+          </div>
+          <button class="btn btn-primary" onclick="updateProfile()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ADD PROPERTY MODAL -->
+<div class="modal-overlay" id="add-property-modal">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-header">
+      <h3>Add New Property</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="form-alert"></div>
+      <form id="property-form" onsubmit="submitProperty(event)" enctype="multipart/form-data">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label class="form-label">Property Name *</label>
+            <input type="text" class="form-input" name="name" required placeholder="e.g. Green Valley PG">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Property Type *</label>
+            <select class="form-select" name="type" required>
+              <option value="">Select type...</option>
+              <option value="PG">PG</option>
+              <option value="Hostel">Hostel</option>
+              <option value="Independent Room">Independent Room</option>
+              <option value="Flat">Flat</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label class="form-label">Description *</label>
+          <textarea class="form-textarea" name="description" required placeholder="Describe your property in detail..."></textarea>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label class="form-label">City *</label>
+            <input type="text" class="form-input" name="city" required placeholder="e.g. Bangalore">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Locality *</label>
+            <input type="text" class="form-input" name="locality" required placeholder="e.g. Koramangala">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nearby College</label>
+            <input type="text" class="form-input" name="nearbyCollege" placeholder="e.g. BMS College">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label class="form-label">Full Address *</label>
+          <input type="text" class="form-input" name="address" required placeholder="Complete address with pincode">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label class="form-label">Monthly Rent (₹) *</label>
+            <input type="number" class="form-input" name="monthlyRent" required min="0" placeholder="e.g. 7500">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Security Deposit (₹) *</label>
+            <input type="number" class="form-input" name="securityDeposit" required min="0" placeholder="e.g. 15000">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label class="form-label">Sharing Type *</label>
+            <select class="form-select" name="sharingType" required>
+              <option value="">Select...</option>
+              <option value="Single">Single</option>
+              <option value="Double">Double</option>
+              <option value="Triple">Triple</option>
+              <option value="Dormitory">Dormitory</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender Preference *</label>
+            <select class="form-select" name="genderPreference" required>
+              <option value="">Select...</option>
+              <option value="Boys">Boys</option>
+              <option value="Girls">Girls</option>
+              <option value="Unisex">Unisex</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Number *</label>
+            <input type="tel" class="form-input" name="contactNumber" required maxlength="10" placeholder="10 digits">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <label class="filter-option" style="display:flex; align-items:center; gap:0.5rem; font-size:0.9rem; padding:0.75rem; border:1.5px solid var(--gray-200); border-radius:var(--radius); cursor:pointer;">
+            <input type="checkbox" name="hasAC" value="true"> ❄️ Air Conditioning Available
+          </label>
+          <label class="filter-option" style="display:flex; align-items:center; gap:0.5rem; font-size:0.9rem; padding:0.75rem; border:1.5px solid var(--gray-200); border-radius:var(--radius); cursor:pointer;">
+            <input type="checkbox" name="hasFood" value="true"> 🍽️ Food Included
+          </label>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label class="form-label">Amenities</label>
+          <div class="amenity-checklist">
+            <label class="amenity-check"><input type="checkbox" value="WiFi" class="amenity-opt"> 📶 WiFi</label>
+            <label class="amenity-check"><input type="checkbox" value="Laundry" class="amenity-opt"> 👕 Laundry</label>
+            <label class="amenity-check"><input type="checkbox" value="Parking" class="amenity-opt"> 🅿️ Parking</label>
+            <label class="amenity-check"><input type="checkbox" value="Gym" class="amenity-opt"> 🏋️ Gym</label>
+            <label class="amenity-check"><input type="checkbox" value="CCTV" class="amenity-opt"> 📹 CCTV</label>
+            <label class="amenity-check"><input type="checkbox" value="Power Backup" class="amenity-opt"> ⚡ Power Backup</label>
+            <label class="amenity-check"><input type="checkbox" value="RO Water" class="amenity-opt"> 💧 RO Water</label>
+            <label class="amenity-check"><input type="checkbox" value="Housekeeping" class="amenity-opt"> 🧹 Housekeeping</label>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label class="form-label">House Rules</label>
+          <textarea class="form-textarea" name="houseRules" rows="2" placeholder="e.g. No smoking. Gate closes at 10 PM."></textarea>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.5rem;">
+          <label class="form-label">Property Images (max 10, 5MB each)</label>
+          <input type="file" class="form-input" id="property-images" name="images" multiple accept="image/*" onchange="previewImages(this)">
+          <span class="form-hint">JPG, PNG or WebP. First image will be the main photo.</span>
+          <div class="image-preview-box" id="image-previews"></div>
+        </div>
+
+        <div style="display:flex; gap:1rem;">
+          <button type="submit" class="btn btn-primary flex-1" id="submit-btn">Submit for Approval</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  if (!requireAuth('owner')) {}
+  const user = getCurrentUser();
+
+  if (user) {
+    document.getElementById('sidebar-avatar').textContent = user.name.charAt(0).toUpperCase();
+    document.getElementById('sidebar-name').textContent = user.name;
+    document.getElementById('welcome-msg').textContent = `Welcome back, ${user.name.split(' ')[0]}! 👋`;
+  }
+
+  function showSection(name, el) {
+    document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
+    document.getElementById('section-' + name).style.display = 'block';
+    if (el) {
+      document.querySelectorAll('.sidebar__nav-link').forEach(l => l.classList.remove('active'));
+      el.classList.add('active');
+    }
+    if (name === 'listings') loadListings();
+    if (name === 'enquiries') loadEnquiries();
+    if (name === 'profile') loadProfile();
+  }
+
+  async function loadStats() {
+    try {
+      const data = await propertyAPI.getMyListings();
+      const props = data.properties;
+      document.getElementById('stat-total').textContent = props.length;
+      document.getElementById('stat-approved').textContent = props.filter(p => p.status === 'approved').length;
+      document.getElementById('stat-pending').textContent = props.filter(p => p.status === 'pending').length;
+      const enqData = await enquiryAPI.getOwnerEnquiries();
+      document.getElementById('stat-enqs').textContent = enqData.enquiries.length;
+    } catch (e) {}
+  }
+
+  async function loadListings() {
+    const tbody = document.getElementById('listings-body');
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;"><div class="spinner" style="margin:0 auto;"></div></td></tr>`;
+    try {
+      const data = await propertyAPI.getMyListings();
+      const props = data.properties;
+      if (props.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray-400);">No listings yet. <button class="btn btn-primary btn-sm" onclick="openAddPropertyModal()">Add your first property</button></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = props.map(p => `
+        <tr>
+          <td>
+            <div style="font-weight:600;">${p.name}</div>
+            <div style="font-size:0.75rem;color:var(--gray-500);">${p.city}, ${p.locality}</div>
+          </td>
+          <td><span class="tag">${p.type}</span></td>
+          <td style="font-weight:600;">₹${p.monthlyRent.toLocaleString()}</td>
+          <td><span class="badge badge-${p.status}">${p.status}</span></td>
+          <td>
+            <span style="color:${p.isAvailable ? 'var(--success)' : 'var(--danger)'}; font-size:0.85rem; font-weight:600;">
+              ${p.isAvailable ? '✅ Available' : '❌ Unavailable'}
+            </span>
+          </td>
+          <td>
+            <div style="display:flex;gap:0.5rem;">
+              <a href="property-details.html?id=${p._id}" class="btn btn-sm btn-secondary">View</a>
+              <button class="btn btn-sm" style="background:${p.isAvailable?'#FEE2E2':'#D1FAE5'};color:${p.isAvailable?'#991B1B':'#065F46'}" onclick="toggleAvail('${p._id}', this)">
+                ${p.isAvailable ? 'Mark Unavailable' : 'Mark Available'}
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteProp('${p._id}')">Delete</button>
+            </div>
+          </td>
+        </tr>`).join('');
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;padding:1rem;">${e.message}</td></tr>`;
+    }
+  }
+
+  async function loadEnquiries() {
+    const tbody = document.getElementById('enq-body');
+    try {
+      const data = await enquiryAPI.getOwnerEnquiries();
+      const enqs = data.enquiries;
+      if (enqs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray-400);">No enquiries received yet.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = enqs.map(e => `
+        <tr>
+          <td>
+            <div style="font-weight:600;">${e.name}</div>
+            <div style="font-size:0.75rem;color:var(--gray-500);">${e.email}</div>
+          </td>
+          <td style="font-weight:500;">${e.property?.name || 'N/A'}</td>
+          <td>${e.phone}</td>
+          <td style="font-size:0.8rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${e.message}">${e.message}</td>
+          <td>${formatDate(e.createdAt)}</td>
+          <td><span class="badge badge-${e.status === 'pending' ? 'pending' : 'approved'}">${e.status}</span></td>
+        </tr>`).join('');
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">${e.message}</td></tr>`;
+    }
+  }
+
+  async function loadProfile() {
+    try {
+      const data = await authAPI.getProfile();
+      document.getElementById('prof-name').value = data.user.name || '';
+      document.getElementById('prof-phone').value = data.user.phone || '';
+      document.getElementById('prof-city').value = data.user.city || '';
+    } catch (e) {}
+  }
+
+  async function updateProfile() {
+    const alertEl = document.getElementById('profile-alert');
+    try {
+      await authAPI.updateProfile({
+        name: document.getElementById('prof-name').value.trim(),
+        phone: document.getElementById('prof-phone').value.trim(),
+        city: document.getElementById('prof-city').value.trim(),
+      });
+      alertEl.innerHTML = `<div class="alert alert-success" style="margin-bottom:1rem;">✅ Profile updated!</div>`;
+    } catch (e) {
+      alertEl.innerHTML = `<div class="alert alert-error" style="margin-bottom:1rem;">${e.message}</div>`;
+    }
+  }
+
+  function openAddPropertyModal() {
+    document.getElementById('add-property-modal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('add-property-modal').classList.remove('active');
+    document.getElementById('property-form').reset();
+    document.getElementById('image-previews').innerHTML = '';
+    document.getElementById('form-alert').innerHTML = '';
+  }
+
+  function previewImages(input) {
+    const preview = document.getElementById('image-previews');
+    preview.innerHTML = '';
+    Array.from(input.files).slice(0, 10).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        preview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function submitProperty(event) {
+    event.preventDefault();
+    const alertEl = document.getElementById('form-alert');
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+    alertEl.innerHTML = '';
+
+    try {
+      const form = document.getElementById('property-form');
+      const formData = new FormData(form);
+
+      // Collect amenities
+      const amenities = Array.from(document.querySelectorAll('.amenity-opt:checked')).map(cb => cb.value);
+      formData.set('amenities', JSON.stringify(amenities));
+
+      // Handle checkboxes properly
+      const hasAC = form.querySelector('[name="hasAC"]').checked;
+      const hasFood = form.querySelector('[name="hasFood"]').checked;
+      formData.set('hasAC', hasAC.toString());
+      formData.set('hasFood', hasFood.toString());
+
+      // Attach images
+      const imageInput = document.getElementById('property-images');
+      formData.delete('images');
+      Array.from(imageInput.files).forEach(file => formData.append('images', file));
+
+      await propertyAPI.create(formData);
+      showToast('Property submitted! Awaiting admin approval.', 'success');
+      closeModal();
+      loadListings();
+      loadStats();
+    } catch (error) {
+      alertEl.innerHTML = `<div class="alert alert-error" style="margin-bottom:1rem;">❌ ${error.message}</div>`;
+      btn.disabled = false;
+      btn.textContent = 'Submit for Approval';
+    }
+  }
+
+  async function toggleAvail(id, btn) {
+    try {
+      const data = await propertyAPI.toggleAvailability(id);
+      showToast(data.message, 'success');
+      loadListings();
+    } catch (e) {
+      showToast(e.message, 'error');
+    }
+  }
+
+  async function deleteProp(id) {
+    if (!confirm('Are you sure you want to delete this property? This cannot be undone.')) return;
+    try {
+      await propertyAPI.delete(id);
+      showToast('Property deleted.', 'success');
+      loadListings();
+      loadStats();
+    } catch (e) {
+      showToast(e.message, 'error');
+    }
+  }
+
+  // Close modal on overlay click
+  document.getElementById('add-property-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  loadStats();
+</script>
+</body>
+</html>

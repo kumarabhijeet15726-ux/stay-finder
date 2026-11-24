@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — StayFinder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: var(--gray-50); }
+
+    .auth-page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* LEFT DECORATIVE SIDE */
+    .auth-visual {
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-visual::before {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 70%);
+      top: -100px;
+      right: -100px;
+    }
+
+    .auth-visual__logo {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .auth-visual__logo span { color: #60A5FA; }
+
+    .auth-visual h2 {
+      color: white;
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .auth-visual p {
+      color: #94A3B8;
+      font-size: 1rem;
+      line-height: 1.7;
+      max-width: 360px;
+      position: relative;
+    }
+
+    .auth-visual__features {
+      margin-top: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      text-align: left;
+      position: relative;
+    }
+
+    .auth-visual__feature {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #94A3B8;
+      font-size: 0.9rem;
+    }
+
+    .auth-visual__feature-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(37,99,235,0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* RIGHT FORM SIDE */
+    .auth-form-side {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      background: white;
+    }
+
+    .auth-form-container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .auth-form-container h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-form-container .subtitle {
+      color: var(--gray-500);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .auth-form-container .subtitle a {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .form-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: var(--gray-400);
+      font-size: 0.8rem;
+      margin: 0.5rem 0;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gray-200);
+    }
+
+    @media (max-width: 768px) {
+      .auth-page { grid-template-columns: 1fr; }
+      .auth-visual { display: none; }
+      .auth-form-side { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-page">
+  <!-- LEFT SIDE -->
+  <div class="auth-visual">
+    <div class="auth-visual__logo">Stay<span>Finder</span></div>
+    <h2>Welcome Back!</h2>
+    <p>Sign in to access your dashboard, saved properties, and enquiries.</p>
+    <div class="auth-visual__features">
+      <div class="auth-visual__feature">
+        <div class="auth-visual__feature-icon">🏠</div>
+        <span>500+ verified PGs and hostels across India</span>
+      </div>
+      <div class="auth-visual__feature">
+        <div class="auth-visual__feature-icon">❤️</div>
+        <span>Save your favourite properties</span>
+      </div>
+      <div class="auth-visual__feature">
+        <div class="auth-visual__feature-icon">📩</div>
+        <span>Contact owners directly — no brokerage</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE: FORM -->
+  <div class="auth-form-side">
+    <div class="auth-form-container">
+      <div style="margin-bottom:2rem;">
+        <a href="index.html" style="color:var(--gray-500); font-size:0.85rem; display:flex; align-items:center; gap:0.4rem;">
+          ← Back to StayFinder
+        </a>
+      </div>
+
+      <h1>Sign In</h1>
+      <p class="subtitle">New to StayFinder? <a href="register.html">Create a free account</a></p>
+
+      <div id="login-alert"></div>
+
+      <form class="form-stack" id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="email" placeholder="you@example.com" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="display:flex; justify-content:space-between;">
+            Password
+            <a href="#" style="font-weight:500; color:var(--primary); font-size:0.8rem;">Forgot password?</a>
+          </label>
+          <div style="position:relative;">
+            <input type="password" class="form-input" id="password" placeholder="Enter your password" required autocomplete="current-password" style="padding-right: 3rem;">
+            <button type="button" onclick="togglePassword()" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); color:var(--gray-400); cursor:pointer; font-size:1rem;">
+              👁
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="login-btn">
+          Sign In
+        </button>
+      </form>
+
+      <div class="divider">or sign in as</div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
+        <button class="btn btn-secondary" onclick="fillDemo('owner')">Demo Owner</button>
+        <button class="btn btn-secondary" onclick="fillDemo('admin')">Demo Admin</button>
+      </div>
+
+      <p style="font-size:0.75rem; color:var(--gray-400); text-align:center; margin-top:1.5rem;">
+        By signing in, you agree to our Terms of Service and Privacy Policy.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // If already logged in, redirect to dashboard
+  const existingUser = getCurrentUser();
+  if (existingUser) {
+    window.location.href = existingUser.role === 'admin' ? 'admin-dashboard.html'
+      : existingUser.role === 'owner' ? 'owner-dashboard.html'
+      : 'student-dashboard.html';
+  }
+
+  async function handleLogin(event) {
+    event.preventDefault();
+    const alertEl = document.getElementById('login-alert');
+    const btn = document.getElementById('login-btn');
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+    alertEl.innerHTML = '';
+
+    try {
+      const data = await authAPI.login({ email, password });
+      saveAuth(data.token, data.user);
+      showToast(`Welcome back, ${data.user.name}! 👋`, 'success');
+
+      // Redirect based on role
+      setTimeout(() => {
+        if (data.user.role === 'admin') window.location.href = 'admin-dashboard.html';
+        else if (data.user.role === 'owner') window.location.href = 'owner-dashboard.html';
+        else window.location.href = 'student-dashboard.html';
+      }, 800);
+    } catch (error) {
+      alertEl.innerHTML = `<div class="alert alert-error" style="margin-bottom:1rem;">❌ ${error.message}</div>`;
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  }
+
+  function togglePassword() {
+    const input = document.getElementById('password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  // Fill demo credentials
+  function fillDemo(role) {
+    if (role === 'owner') {
+      document.getElementById('email').value = 'owner@example.com';
+      document.getElementById('password').value = 'Owner@123';
+    } else if (role === 'admin') {
+      document.getElementById('email').value = 'admin@stayfinder.com';
+      document.getElementById('password').value = 'Admin@123';
+    }
+    showToast(`Demo ${role} credentials filled. Click Sign In!`, 'info');
+  }
+</script>
+</body>
+</html>

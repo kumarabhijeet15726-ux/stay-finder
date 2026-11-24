@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard — StayFinder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar__inner">
+      <a href="index.html" class="navbar__logo">
+        <div class="navbar__logo-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+          </svg>
+        </div>
+        Stay<span>Finder</span>
+      </a>
+      <div class="navbar__actions" id="navbar-actions"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="dashboard-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__user">
+      <div class="sidebar__user-avatar" id="sidebar-avatar">S</div>
+      <div class="sidebar__user-name" id="sidebar-name">Student</div>
+      <div class="sidebar__user-role">Student Account</div>
+    </div>
+
+    <nav class="sidebar__nav">
+      <div class="sidebar__nav-label">Main</div>
+      <a class="sidebar__nav-link active" onclick="showSection('overview')">
+        🏠 Overview
+      </a>
+      <a class="sidebar__nav-link" onclick="showSection('favourites')">
+        ❤️ Saved Properties
+      </a>
+      <a class="sidebar__nav-link" onclick="showSection('enquiries')">
+        📩 My Enquiries
+      </a>
+
+      <div class="sidebar__nav-label" style="margin-top:1rem;">Account</div>
+      <a class="sidebar__nav-link" onclick="showSection('profile')">
+        👤 My Profile
+      </a>
+      <a href="explore.html" class="sidebar__nav-link">
+        🔍 Explore Properties
+      </a>
+      <a class="sidebar__nav-link" onclick="handleLogout()" style="color: #EF4444;">
+        🚪 Logout
+      </a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="dashboard-main">
+    <div id="section-overview">
+      <h2 style="margin-bottom:0.5rem;" id="welcome-msg">Welcome back! 👋</h2>
+      <p class="text-muted text-sm" style="margin-bottom:2rem;">Here's what's happening with your accommodation search.</p>
+
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-3 gap-4" style="margin-bottom:2rem;">
+        <div class="stat-card">
+          <div class="stat-card__icon blue">❤️</div>
+          <div>
+            <div class="stat-card__value" id="stat-favs">0</div>
+            <div class="stat-card__label">Saved Properties</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon green">📩</div>
+          <div>
+            <div class="stat-card__value" id="stat-enqs">0</div>
+            <div class="stat-card__label">Enquiries Sent</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon yellow">🏠</div>
+          <div>
+            <div class="stat-card__value">500+</div>
+            <div class="stat-card__label">Properties Available</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="table-container">
+        <div class="table-header">
+          <h3 style="font-size:1rem;">Quick Actions</h3>
+        </div>
+        <div style="padding:1.5rem; display:flex; gap:1rem; flex-wrap:wrap;">
+          <a href="explore.html" class="btn btn-primary">🔍 Search Properties</a>
+          <button class="btn btn-secondary" onclick="showSection('favourites')">❤️ View Saved</button>
+          <button class="btn btn-secondary" onclick="showSection('enquiries')">📩 My Enquiries</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAVOURITES SECTION -->
+    <div id="section-favourites" style="display:none;">
+      <h2 style="margin-bottom:0.5rem;">Saved Properties</h2>
+      <p class="text-muted text-sm" style="margin-bottom:2rem;">Properties you've saved for later.</p>
+      <div id="favs-grid" class="grid grid-cols-2 gap-4">
+        <div class="loading-state" style="grid-column:1/-1"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- ENQUIRIES SECTION -->
+    <div id="section-enquiries" style="display:none;">
+      <h2 style="margin-bottom:0.5rem;">My Enquiries</h2>
+      <p class="text-muted text-sm" style="margin-bottom:2rem;">Enquiries you've sent to property owners.</p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Location</th>
+              <th>Rent</th>
+              <th>Date Sent</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="enquiries-body">
+            <tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--gray-400);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PROFILE SECTION -->
+    <div id="section-profile" style="display:none;">
+      <h2 style="margin-bottom:0.5rem;">My Profile</h2>
+      <p class="text-muted text-sm" style="margin-bottom:2rem;">Update your personal information.</p>
+
+      <div style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-lg); padding:2rem; max-width:540px;">
+        <div id="profile-alert"></div>
+        <div class="form-stack" style="display:flex; flex-direction:column; gap:1.25rem;">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" id="prof-name" placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" class="form-input" id="prof-phone" placeholder="10-digit number">
+          </div>
+          <div class="form-group">
+            <label class="form-label">College</label>
+            <input type="text" class="form-input" id="prof-college" placeholder="Your college name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" class="form-input" id="prof-city" placeholder="Your city">
+          </div>
+          <button class="btn btn-primary" onclick="updateProfile()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // Protect: redirect if not a student
+  if (!requireAuth('student')) {}
+
+  const user = getCurrentUser();
+
+  // Set sidebar info
+  if (user) {
+    document.getElementById('sidebar-avatar').textContent = user.name.charAt(0).toUpperCase();
+    document.getElementById('sidebar-name').textContent = user.name;
+    document.getElementById('welcome-msg').textContent = `Welcome back, ${user.name.split(' ')[0]}! 👋`;
+  }
+
+  function showSection(name) {
+    document.querySelectorAll('[id^="section-"]').forEach(el => el.style.display = 'none');
+    document.getElementById('section-' + name).style.display = 'block';
+    document.querySelectorAll('.sidebar__nav-link').forEach(el => el.classList.remove('active'));
+    event.target.classList.add('active');
+
+    if (name === 'favourites') loadFavourites();
+    if (name === 'enquiries') loadEnquiries();
+    if (name === 'profile') loadProfile();
+  }
+
+  async function loadDashboardStats() {
+    try {
+      const [favData, enqData] = await Promise.all([
+        favouriteAPI.getAll(),
+        enquiryAPI.getMyEnquiries()
+      ]);
+      document.getElementById('stat-favs').textContent = favData.favourites.length;
+      document.getElementById('stat-enqs').textContent = enqData.enquiries.length;
+    } catch (e) {}
+  }
+
+  async function loadFavourites() {
+    const grid = document.getElementById('favs-grid');
+    try {
+      const data = await favouriteAPI.getAll();
+      const favs = data.favourites;
+      if (favs.length === 0) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+          <h3>No Saved Properties</h3>
+          <p>Heart any property to save it here.</p>
+          <a href="explore.html" class="btn btn-primary">Explore Properties</a>
+        </div>`;
+        return;
+      }
+      grid.innerHTML = favs.map(f => f.property ? buildPropertyCard(f.property, true) : '').join('');
+    } catch (e) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><p>${e.message}</p></div>`;
+    }
+  }
+
+  async function loadEnquiries() {
+    const tbody = document.getElementById('enquiries-body');
+    try {
+      const data = await enquiryAPI.getMyEnquiries();
+      const enqs = data.enquiries;
+      if (enqs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state" style="text-align:center; padding:2rem; color:var(--gray-400);">No enquiries sent yet.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = enqs.map(e => `
+        <tr>
+          <td><a href="property-details.html?id=${e.property?._id}" style="font-weight:600; color:var(--primary);">${e.property?.name || 'N/A'}</a></td>
+          <td>${e.property?.city || 'N/A'}, ${e.property?.locality || ''}</td>
+          <td>${e.property?.monthlyRent ? '₹' + e.property.monthlyRent.toLocaleString() : 'N/A'}</td>
+          <td>${formatDate(e.createdAt)}</td>
+          <td><span class="badge badge-${e.status === 'pending' ? 'pending' : 'approved'}">${e.status}</span></td>
+        </tr>`).join('');
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">${e.message}</td></tr>`;
+    }
+  }
+
+  async function loadProfile() {
+    try {
+      const data = await authAPI.getProfile();
+      const u = data.user;
+      document.getElementById('prof-name').value = u.name || '';
+      document.getElementById('prof-phone').value = u.phone || '';
+      document.getElementById('prof-college').value = u.college || '';
+      document.getElementById('prof-city').value = u.city || '';
+    } catch (e) {}
+  }
+
+  async function updateProfile() {
+    const alertEl = document.getElementById('profile-alert');
+    try {
+      const data = await authAPI.updateProfile({
+        name: document.getElementById('prof-name').value.trim(),
+        phone: document.getElementById('prof-phone').value.trim(),
+        college: document.getElementById('prof-college').value.trim(),
+        city: document.getElementById('prof-city').value.trim(),
+      });
+      // Update localStorage
+      saveAuth(getToken(), { ...getCurrentUser(), ...data.user });
+      alertEl.innerHTML = `<div class="alert alert-success" style="margin-bottom:1rem;">✅ Profile updated!</div>`;
+      showToast('Profile saved!', 'success');
+    } catch (e) {
+      alertEl.innerHTML = `<div class="alert alert-error" style="margin-bottom:1rem;">${e.message}</div>`;
+    }
+  }
+
+  loadDashboardStats();
+</script>
+</body>
+</html>

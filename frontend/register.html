@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — StayFinder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: var(--gray-50); }
+
+    .auth-page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .auth-visual {
+      background: linear-gradient(135deg, #0F172A, #1E293B);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-visual::before {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%);
+      bottom: -100px;
+      left: -100px;
+    }
+
+    .auth-visual__logo {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .auth-visual__logo span { color: #60A5FA; }
+    .auth-visual h2 { color: white; font-size: 1.75rem; margin-bottom: 1rem; position: relative; }
+    .auth-visual p { color: #94A3B8; font-size: 1rem; line-height: 1.7; max-width: 360px; position: relative; }
+
+    .role-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 2rem;
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .role-card-visual {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 1rem;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      color: white;
+    }
+
+    .role-card-visual .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .role-card-visual h4 { font-size: 0.9rem; color: white; }
+    .role-card-visual p { font-size: 0.75rem; color: #94A3B8; margin-top: 0.25rem; }
+
+    .auth-form-side {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      background: white;
+      overflow-y: auto;
+    }
+
+    .auth-form-container {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .role-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .role-option {
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .role-option:hover { border-color: var(--primary); background: var(--primary-light); }
+
+    .role-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .role-option .role-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+    .role-option h4 { font-size: 0.875rem; color: var(--secondary); }
+    .role-option p { font-size: 0.72rem; color: var(--gray-500); margin-top: 0.2rem; }
+
+    .form-stack { display: flex; flex-direction: column; gap: 1rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    @media (max-width: 768px) {
+      .auth-page { grid-template-columns: 1fr; }
+      .auth-visual { display: none; }
+      .auth-form-side { padding: 2rem 1.5rem; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-page">
+  <!-- LEFT SIDE -->
+  <div class="auth-visual">
+    <div class="auth-visual__logo">Stay<span>Finder</span></div>
+    <h2>Join StayFinder Today</h2>
+    <p>Create your free account and start finding the perfect accommodation or list your property.</p>
+    <div class="role-cards">
+      <div class="role-card-visual">
+        <div class="icon">🎓</div>
+        <h4>Students</h4>
+        <p>Find PGs and rooms near your college</p>
+      </div>
+      <div class="role-card-visual">
+        <div class="icon">🏠</div>
+        <h4>Owners</h4>
+        <p>List your property and reach students</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE: FORM -->
+  <div class="auth-form-side">
+    <div class="auth-form-container">
+      <div style="margin-bottom:1.5rem;">
+        <a href="index.html" style="color:var(--gray-500); font-size:0.85rem; display:flex; align-items:center; gap:0.4rem;">
+          ← Back to StayFinder
+        </a>
+      </div>
+
+      <h1 style="font-size:1.75rem; margin-bottom:0.5rem;">Create Your Account</h1>
+      <p style="color:var(--gray-500); margin-bottom:1.5rem; font-size:0.9rem;">
+        Already have an account? <a href="login.html" style="color:var(--primary); font-weight:600;">Sign in here</a>
+      </p>
+
+      <!-- ROLE SELECTOR -->
+      <div class="role-selector">
+        <div class="role-option selected" id="role-student" onclick="selectRole('student')">
+          <div class="role-icon">🎓</div>
+          <h4>I'm a Student</h4>
+          <p>Looking for accommodation</p>
+        </div>
+        <div class="role-option" id="role-owner" onclick="selectRole('owner')">
+          <div class="role-icon">🏠</div>
+          <h4>I'm an Owner</h4>
+          <p>Want to list my property</p>
+        </div>
+      </div>
+
+      <div id="register-alert"></div>
+
+      <form class="form-stack" id="register-form" onsubmit="handleRegister(event)">
+        <input type="hidden" id="selected-role" value="student">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" class="form-input" id="name" placeholder="Your full name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number *</label>
+            <input type="tel" class="form-input" id="phone" placeholder="10-digit number" maxlength="10" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input type="email" class="form-input" id="email" placeholder="you@example.com" required>
+        </div>
+
+        <div class="form-group" id="college-field">
+          <label class="form-label">College Name <span class="text-muted" style="font-weight:400;">(optional)</span></label>
+          <input type="text" class="form-input" id="college" placeholder="e.g. BMS College of Engineering">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input type="text" class="form-input" id="city" placeholder="e.g. Bangalore">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <div style="position:relative;">
+            <input type="password" class="form-input" id="password" placeholder="Minimum 6 characters" required minlength="6" style="padding-right:3rem;">
+            <button type="button" onclick="togglePwd()" style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);color:var(--gray-400);cursor:pointer;">👁</button>
+          </div>
+          <span class="form-hint">At least 6 characters.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirm Password *</label>
+          <input type="password" class="form-input" id="confirm-password" placeholder="Repeat your password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="register-btn">
+          Create Account
+        </button>
+      </form>
+
+      <p style="font-size:0.75rem; color:var(--gray-400); text-align:center; margin-top:1.25rem;">
+        By signing up, you agree to our <a href="#" style="color:var(--primary);">Terms</a> and <a href="#" style="color:var(--primary);">Privacy Policy</a>.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // Auto-select role from URL param
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('role') === 'owner') selectRole('owner');
+
+  function selectRole(role) {
+    document.getElementById('selected-role').value = role;
+    document.getElementById('role-student').classList.toggle('selected', role === 'student');
+    document.getElementById('role-owner').classList.toggle('selected', role === 'owner');
+    // Show/hide college field (only for students)
+    document.getElementById('college-field').style.display = role === 'student' ? 'flex' : 'none';
+  }
+
+  function togglePwd() {
+    const input = document.getElementById('password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  async function handleRegister(event) {
+    event.preventDefault();
+    const alertEl = document.getElementById('register-alert');
+    const btn = document.getElementById('register-btn');
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    const role = document.getElementById('selected-role').value;
+    const college = document.getElementById('college').value.trim();
+    const city = document.getElementById('city').value.trim();
+
+    alertEl.innerHTML = '';
+
+    // Client-side validation
+    if (password !== confirmPassword) {
+      alertEl.innerHTML = `<div class="alert alert-error" style="margin-bottom:1rem;">❌ Passwords do not match.</div>`;
+      return;
+    }
+
+    if (phone.length !== 10 || !/^\d+$/.test(phone)) {
+      alertEl.innerHTML = `<div class="alert alert-error" style="margin-bottom:1rem;">❌ Please enter a valid 10-digit phone number.</div>`;
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Creating account...';
+
+    try {
+      const data = await authAPI.register({ name, email, password, phone, role, college, city });
+      saveAuth(data.token, data.user);
+      showToast(`Welcome to StayFinder, ${data.user.name}! 🎉`, 'success');
+
+      setTimeout(() => {
+        if (data.user.role === 'owner') window.location.href = 'owner-dashboard.html';
+        else window.location.href = 'student-dashboard.html';
+      }, 800);
+    } catch (error) {
+      alertEl.innerHTML = `<div class="alert alert-error" style="margin-bottom:1rem;">❌ ${error.message}</div>`;
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+    }
+  }
+</script>
+</body>
+</html>

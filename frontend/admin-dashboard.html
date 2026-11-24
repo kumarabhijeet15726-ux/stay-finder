@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — StayFinder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar__inner">
+      <a href="index.html" class="navbar__logo">
+        <div class="navbar__logo-icon" style="background:#EF4444;">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+          </svg>
+        </div>
+        Stay<span>Finder</span> <span style="font-size:0.65rem;background:#EF4444;color:white;padding:0.15rem 0.4rem;border-radius:4px;margin-left:0.25rem;font-weight:700;vertical-align:middle;">ADMIN</span>
+      </a>
+      <div class="navbar__actions" id="navbar-actions"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="dashboard-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__user">
+      <div class="sidebar__user-avatar" id="sidebar-avatar" style="background:#EF4444;">A</div>
+      <div class="sidebar__user-name" id="sidebar-name">Admin</div>
+      <div class="sidebar__user-role" style="color:#FCA5A5;">Administrator</div>
+    </div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__nav-label">Dashboard</div>
+      <a class="sidebar__nav-link active" onclick="showSection('overview', this)">📊 Overview</a>
+      <a class="sidebar__nav-link" onclick="showSection('approvals', this)">⏳ Pending Approvals</a>
+      <a class="sidebar__nav-link" onclick="showSection('properties', this)">🏠 All Properties</a>
+
+      <div class="sidebar__nav-label" style="margin-top:1rem;">Users</div>
+      <a class="sidebar__nav-link" onclick="showSection('students', this)">🎓 Students</a>
+      <a class="sidebar__nav-link" onclick="showSection('owners', this)">🏠 Owners</a>
+      <a class="sidebar__nav-link" onclick="showSection('enquiries', this)">📩 All Enquiries</a>
+
+      <div class="sidebar__nav-label" style="margin-top:1rem;">Account</div>
+      <a href="explore.html" class="sidebar__nav-link">🔍 View Site</a>
+      <a class="sidebar__nav-link" onclick="handleLogout()" style="color:#EF4444;">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="dashboard-main">
+
+    <!-- OVERVIEW -->
+    <div id="section-overview">
+      <h2 style="margin-bottom:0.5rem;">Admin Dashboard</h2>
+      <p class="text-muted text-sm" style="margin-bottom:2rem;">Complete overview of the StayFinder platform.</p>
+
+      <div class="grid grid-cols-3 gap-4" style="margin-bottom:2rem;">
+        <div class="stat-card">
+          <div class="stat-card__icon blue"><span style="font-size:1.3rem;">🎓</span></div>
+          <div>
+            <div class="stat-card__value" id="stat-students">0</div>
+            <div class="stat-card__label">Total Students</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon green"><span style="font-size:1.3rem;">🏠</span></div>
+          <div>
+            <div class="stat-card__value" id="stat-owners">0</div>
+            <div class="stat-card__label">Total Owners</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon yellow"><span style="font-size:1.3rem;">🏘️</span></div>
+          <div>
+            <div class="stat-card__value" id="stat-props">0</div>
+            <div class="stat-card__label">Total Properties</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon red"><span style="font-size:1.3rem;">⏳</span></div>
+          <div>
+            <div class="stat-card__value" id="stat-pending">0</div>
+            <div class="stat-card__label">Pending Approvals</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon green"><span style="font-size:1.3rem;">✅</span></div>
+          <div>
+            <div class="stat-card__value" id="stat-approved">0</div>
+            <div class="stat-card__label">Approved Properties</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon blue"><span style="font-size:1.3rem;">📩</span></div>
+          <div>
+            <div class="stat-card__value" id="stat-enqs">0</div>
+            <div class="stat-card__label">Total Enquiries</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending action alert -->
+      <div id="pending-alert"></div>
+    </div>
+
+    <!-- PENDING APPROVALS -->
+    <div id="section-approvals" style="display:none;">
+      <h2 style="margin-bottom:0.5rem;">⏳ Pending Approvals</h2>
+      <p class="text-muted text-sm" style="margin-bottom:1.5rem;">Review and approve or reject property listings submitted by owners.</p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Property Name</th>
+              <th>Owner</th>
+              <th>City</th>
+              <th>Type</th>
+              <th>Rent/Month</th>
+              <th>Submitted</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pending-body">
+            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--gray-400)">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ALL PROPERTIES -->
+    <div id="section-properties" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+        <div>
+          <h2 style="margin-bottom:0.25rem;">All Properties</h2>
+          <p class="text-muted text-sm">Complete property database</p>
+        </div>
+        <select class="form-select" style="width:auto;" id="prop-status-filter" onchange="loadAllProperties()">
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Owner</th>
+              <th>City</th>
+              <th>Rent</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="all-props-body">
+            <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray-400)">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div id="section-students" style="display:none;">
+      <h2 style="margin-bottom:0.5rem;">Registered Students</h2>
+      <p class="text-muted text-sm" style="margin-bottom:1.5rem;">All student accounts on the platform.</p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Phone</th><th>College</th><th>Joined</th><th>Status</th></tr>
+          </thead>
+          <tbody id="students-body">
+            <tr><td colspan="6" style="text-align:center;padding:2rem;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- OWNERS -->
+    <div id="section-owners" style="display:none;">
+      <h2 style="margin-bottom:0.5rem;">Registered Owners</h2>
+      <p class="text-muted text-sm" style="margin-bottom:1.5rem;">All property owners on the platform.</p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Joined</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody id="owners-body">
+            <tr><td colspan="7" style="text-align:center;padding:2rem;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ENQUIRIES -->
+    <div id="section-enquiries" style="display:none;">
+      <h2 style="margin-bottom:0.5rem;">All Enquiries</h2>
+      <p class="text-muted text-sm" style="margin-bottom:1.5rem;">Every enquiry made on the platform.</p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Student</th><th>Property</th><th>Owner</th><th>Message</th><th>Date</th><th>Status</th></tr>
+          </thead>
+          <tbody id="all-enq-body">
+            <tr><td colspan="6" style="text-align:center;padding:2rem;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  if (!requireAuth('admin')) {}
+  const user = getCurrentUser();
+  if (user) {
+    document.getElementById('sidebar-avatar').textContent = user.name.charAt(0).toUpperCase();
+    document.getElementById('sidebar-name').textContent = user.name;
+  }
+
+  function showSection(name, el) {
+    document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
+    document.getElementById('section-' + name).style.display = 'block';
+    if (el) {
+      document.querySelectorAll('.sidebar__nav-link').forEach(l => l.classList.remove('active'));
+      el.classList.add('active');
+    }
+    if (name === 'approvals') loadPendingApprovals();
+    if (name === 'properties') loadAllProperties();
+    if (name === 'students') loadUsers('student');
+    if (name === 'owners') loadUsers('owner');
+    if (name === 'enquiries') loadEnquiries();
+  }
+
+  async function loadStats() {
+    try {
+      const data = await adminAPI.getStats();
+      const s = data.stats;
+      document.getElementById('stat-students').textContent = s.totalStudents;
+      document.getElementById('stat-owners').textContent = s.totalOwners;
+      document.getElementById('stat-props').textContent = s.totalProperties;
+      document.getElementById('stat-pending').textContent = s.pendingProperties;
+      document.getElementById('stat-approved').textContent = s.approvedProperties;
+      document.getElementById('stat-enqs').textContent = s.totalEnquiries;
+
+      if (s.pendingProperties > 0) {
+        document.getElementById('pending-alert').innerHTML = `
+          <div class="alert alert-warning">
+            ⚠️ You have <strong>${s.pendingProperties} property listing(s)</strong> waiting for your review.
+            <button class="btn btn-sm" style="margin-left:1rem;background:var(--warning);color:#1E293B;font-weight:700;" onclick="showSection('approvals', document.querySelector('.sidebar__nav-link:nth-child(3)'))">
+              Review Now →
+            </button>
+          </div>`;
+      }
+    } catch (e) {
+      showToast('Could not load stats: ' + e.message, 'error');
+    }
+  }
+
+  async function loadPendingApprovals() {
+    const tbody = document.getElementById('pending-body');
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;"><div class="spinner" style="margin:0 auto;"></div></td></tr>`;
+    try {
+      const data = await adminAPI.getAllProperties('pending');
+      const props = data.properties;
+      if (props.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--success);">✅ No pending approvals. All caught up!</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = props.map(p => `
+        <tr>
+          <td>
+            <div style="font-weight:600;">${p.name}</div>
+            <div style="font-size:0.75rem;color:var(--gray-500);">${p.type} · ${p.genderPreference}</div>
+          </td>
+          <td>
+            <div style="font-weight:500;">${p.owner?.name || 'N/A'}</div>
+            <div style="font-size:0.75rem;color:var(--gray-500);">${p.owner?.phone || ''}</div>
+          </td>
+          <td>${p.city}, ${p.locality}</td>
+          <td><span class="tag">${p.type}</span></td>
+          <td style="font-weight:600;">₹${p.monthlyRent.toLocaleString()}</td>
+          <td style="font-size:0.8rem;">${formatDate(p.createdAt)}</td>
+          <td>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+              <a href="property-details.html?id=${p._id}" target="_blank" class="btn btn-sm btn-secondary">View</a>
+              <button class="btn btn-sm btn-success" onclick="approveProperty('${p._id}', this)">✅ Approve</button>
+              <button class="btn btn-sm btn-danger" onclick="rejectProperty('${p._id}', this)">❌ Reject</button>
+            </div>
+          </td>
+        </tr>`).join('');
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="7" style="color:red;text-align:center;padding:1rem;">${e.message}</td></tr>`;
+    }
+  }
+
+  async function approveProperty(id, btn) {
+    btn.disabled = true; btn.textContent = '...';
+    try {
+      await adminAPI.approveProperty(id);
+      showToast('Property approved! Now visible to students.', 'success');
+      loadPendingApprovals();
+      loadStats();
+    } catch (e) {
+      showToast(e.message, 'error');
+      btn.disabled = false; btn.textContent = '✅ Approve';
+    }
+  }
+
+  async function rejectProperty(id, btn) {
+    if (!confirm('Reject this property listing?')) return;
+    btn.disabled = true; btn.textContent = '...';
+    try {
+      await adminAPI.rejectProperty(id);
+      showToast('Property rejected.', 'info');
+      loadPendingApprovals();
+      loadStats();
+    } catch (e) {
+      showToast(e.message, 'error');
+      btn.disabled = false; btn.textContent = '❌ Reject';
+    }
+  }
+
+  async function loadAllProperties() {
+    const tbody = document.getElementById('all-props-body');
+    const status = document.getElementById('prop-status-filter')?.value;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;"><div class="spinner" style="margin:0 auto;"></div></td></tr>`;
+    try {
+      const data = await adminAPI.getAllProperties(status);
+      tbody.innerHTML = data.properties.map(p => `
+        <tr>
+          <td><div style="font-weight:600;">${p.name}</div><div style="font-size:0.75rem;color:var(--gray-500);">${p.locality}</div></td>
+          <td>${p.owner?.name || 'N/A'}</td>
+          <td>${p.city}</td>
+          <td style="font-weight:600;">₹${p.monthlyRent.toLocaleString()}</td>
+          <td><span class="badge badge-${p.status}">${p.status}</span></td>
+          <td>
+            <div style="display:flex;gap:0.5rem;">
+              <a href="property-details.html?id=${p._id}" target="_blank" class="btn btn-sm btn-secondary">View</a>
+              ${p.status === 'pending' ? `<button class="btn btn-sm btn-success" onclick="approveProperty('${p._id}', this)">Approve</button>` : ''}
+              <button class="btn btn-sm btn-danger" onclick="deleteProperty('${p._id}')">Delete</button>
+            </div>
+          </td>
+        </tr>`).join('') || `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray-400)">No properties found.</td></tr>`;
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">${e.message}</td></tr>`;
+    }
+  }
+
+  async function deleteProperty(id) {
+    if (!confirm('Permanently delete this property?')) return;
+    try {
+      await propertyAPI.delete(id);
+      showToast('Property deleted.', 'success');
+      loadAllProperties();
+    } catch (e) {
+      showToast(e.message, 'error');
+    }
+  }
+
+  async function loadUsers(role) {
+    const bodyId = role === 'student' ? 'students-body' : 'owners-body';
+    const tbody = document.getElementById(bodyId);
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;"><div class="spinner" style="margin:0 auto;"></div></td></tr>`;
+    try {
+      const data = await adminAPI.getAllUsers(role);
+      const users = data.users;
+      if (users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--gray-400)">No ${role}s found.</td></tr>`;
+        return;
+      }
+
+      const isOwner = role === 'owner';
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td style="font-weight:600;">${u.name}</td>
+          <td style="font-size:0.85rem;">${u.email}</td>
+          <td>${u.phone || 'N/A'}</td>
+          <td>${isOwner ? (u.city || 'N/A') : (u.college || 'N/A')}</td>
+          <td style="font-size:0.8rem;">${formatDate(u.createdAt)}</td>
+          <td><span style="color:${u.isActive ? 'var(--success)' : 'var(--danger)'}; font-weight:600; font-size:0.8rem;">${u.isActive ? '✅ Active' : '❌ Inactive'}</span></td>
+          ${isOwner ? `<td><button class="btn btn-sm" style="background:${u.isActive ? '#FEE2E2' : '#D1FAE5'};color:${u.isActive ? '#991B1B' : '#065F46'}" onclick="toggleUser('${u._id}')">${u.isActive ? 'Deactivate' : 'Activate'}</button></td>` : ''}
+        </tr>`).join('');
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="7" style="color:red;text-align:center;">${e.message}</td></tr>`;
+    }
+  }
+
+  async function toggleUser(id) {
+    try {
+      const data = await adminAPI.toggleUserStatus(id);
+      showToast(data.message, 'success');
+      // Reload whichever user section is visible
+      if (document.getElementById('section-owners').style.display !== 'none') loadUsers('owner');
+      if (document.getElementById('section-students').style.display !== 'none') loadUsers('student');
+    } catch (e) {
+      showToast(e.message, 'error');
+    }
+  }
+
+  async function loadEnquiries() {
+    const tbody = document.getElementById('all-enq-body');
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;"><div class="spinner" style="margin:0 auto;"></div></td></tr>`;
+    try {
+      const data = await enquiryAPI.getOwnerEnquiries(); // Fallback: use admin endpoint
+      // Actually admin endpoint - force via adminAPI
+      const res = await fetch('http://localhost:5000/api/enquiries', {
+        headers: { Authorization: 'Bearer ' + getToken() }
+      });
+      const enqData = await res.json();
+      const enqs = enqData.enquiries || [];
+      if (enqs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray-400)">No enquiries yet.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = enqs.map(e => `
+        <tr>
+          <td><div style="font-weight:600;">${e.name}</div><div style="font-size:0.75rem;color:var(--gray-500);">${e.email}</div></td>
+          <td>${e.property?.name || 'N/A'}</td>
+          <td>${e.owner?.name || 'N/A'}</td>
+          <td style="font-size:0.8rem;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${e.message}">${e.message}</td>
+          <td style="font-size:0.8rem;">${formatDate(e.createdAt)}</td>
+          <td><span class="badge badge-${e.status === 'pending' ? 'pending' : 'approved'}">${e.status}</span></td>
+        </tr>`).join('');
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">${e.message}</td></tr>`;
+    }
+  }
+
+  loadStats();
+</script>
+</body>
+</html>

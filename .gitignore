@@ -1,0 +1,15 @@
+# Node dependencies
+node_modules/
+package-lock.json
+
+# Environment variables (keeps passwords secret)
+.env
+
+# Uploaded images (local test files)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# System & OS files
+.DS_Store
+Thumbs.db
+*.log

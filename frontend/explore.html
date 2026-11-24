@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore Properties — StayFinder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .explore-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2rem;
+      align-items: start;
+      padding: 2rem 0;
+    }
+
+    /* FILTER SIDEBAR */
+    .filter-panel {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      position: sticky;
+      top: 90px;
+    }
+
+    .filter-panel h3 {
+      font-size: 1rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filter-panel h3 button {
+      font-size: 0.75rem;
+      color: var(--primary);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .filter-group {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .filter-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .filter-group__label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--gray-700);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.75rem;
+    }
+
+    .filter-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      color: var(--gray-700);
+    }
+
+    .filter-option input[type="radio"],
+    .filter-option input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .price-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .price-inputs input {
+      padding: 0.5rem 0.75rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      outline: none;
+      width: 100%;
+    }
+
+    .price-inputs input:focus { border-color: var(--primary); }
+
+    /* RESULTS AREA */
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .results-count {
+      font-size: 0.95rem;
+      color: var(--gray-600);
+    }
+
+    .results-count strong { color: var(--secondary); }
+
+    .sort-select {
+      padding: 0.5rem 1rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      color: var(--gray-700);
+      outline: none;
+      cursor: pointer;
+      background: white;
+    }
+
+    .sort-select:focus { border-color: var(--primary); }
+
+    /* SEARCH BAR AT TOP */
+    .explore-search {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .explore-search input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 0.95rem;
+      color: var(--gray-800);
+    }
+
+    .explore-search input::placeholder { color: var(--gray-400); }
+
+    .properties-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    /* Active filter chips */
+    .active-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: var(--radius-full);
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .filter-chip button {
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 0.9rem;
+      line-height: 1;
+    }
+
+    @media (max-width: 1024px) {
+      .explore-layout { grid-template-columns: 240px 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .explore-layout { grid-template-columns: 1fr; }
+      .filter-panel { position: relative; top: 0; display: none; }
+      .filter-panel.show { display: block; }
+      .properties-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar__inner">
+      <a href="index.html" class="navbar__logo">
+        <div class="navbar__logo-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+          </svg>
+        </div>
+        Stay<span>Finder</span>
+      </a>
+      <ul class="navbar__links" id="navbar-links">
+        <li><a href="index.html" class="navbar__link">Home</a></li>
+        <li><a href="explore.html" class="navbar__link active">Explore</a></li>
+      </ul>
+      <div class="navbar__actions" id="navbar-actions">
+        <a href="login.html" class="btn btn-secondary btn-sm">Log In</a>
+        <a href="register.html" class="btn btn-primary btn-sm">Sign Up</a>
+      </div>
+      <button class="navbar__toggle" id="navbar-toggle"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div style="background: var(--gray-50); border-bottom: 1px solid var(--gray-200); padding: 1.5rem 0;">
+  <div class="container" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+    <div>
+      <h2 style="font-size:1.5rem; margin-bottom:0.25rem;">Explore Properties</h2>
+      <p class="text-muted text-sm">Find PGs, hostels and rooms near your college</p>
+    </div>
+    <button class="btn btn-secondary btn-sm" id="filter-toggle-btn" onclick="toggleFilters()" style="display:none;">
+      ⚙️ Filters
+    </button>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="container">
+  <div class="explore-layout">
+
+    <!-- FILTER SIDEBAR -->
+    <aside class="filter-panel" id="filter-panel">
+      <h3>
+        Filters
+        <button onclick="clearAllFilters()">Clear All</button>
+      </h3>
+
+      <!-- Gender -->
+      <div class="filter-group">
+        <div class="filter-group__label">Gender</div>
+        <div class="filter-options">
+          <label class="filter-option">
+            <input type="radio" name="gender" value="" checked> All
+          </label>
+          <label class="filter-option">
+            <input type="radio" name="gender" value="Girls"> 👩 Girls Only
+          </label>
+          <label class="filter-option">
+            <input type="radio" name="gender" value="Boys"> 👨 Boys Only
+          </label>
+          <label class="filter-option">
+            <input type="radio" name="gender" value="Unisex"> 🤝 Unisex
+          </label>
+        </div>
+      </div>
+
+      <!-- Property Type -->
+      <div class="filter-group">
+        <div class="filter-group__label">Property Type</div>
+        <div class="filter-options">
+          <label class="filter-option">
+            <input type="radio" name="type" value="" checked> All Types
+          </label>
+          <label class="filter-option">
+            <input type="radio" name="type" value="PG"> PG
+          </label>
+          <label class="filter-option">
+            <input type="radio" name="type" value="Hostel"> Hostel
+          </label>
+          <label class="filter-option">
+            <input type="radio" name="type" value="Independent Room"> Independent Room
+          </label>
+          <label class="filter-option">
+            <input type="radio" name="type" value="Flat"> Flat
+          </label>
+        </div>
+      </div>
+
+      <!-- Room Sharing -->
+      <div class="filter-group">
+        <div class="filter-group__label">Room Sharing</div>
+        <div class="filter-options">
+          <label class="filter-option">
+            <input type="radio" name="sharing" value="" checked> Any
+          </label>
+          <label class="filter-option">
+            <input type="radio" name="sharing" value="Single"> Single
+          </label>
+          <label class="filter-option">
+            <input type="radio" name="sharing" value="Double"> Double
+          </label>
+          <label class="filter-option">
+            <input type="radio" name="sharing" value="Triple"> Triple
+          </label>
+        </div>
+      </div>
+
+      <!-- Budget -->
+      <div class="filter-group">
+        <div class="filter-group__label">Monthly Budget (₹)</div>
+        <div class="price-inputs">
+          <input type="number" id="min-rent" placeholder="Min" min="0">
+          <input type="number" id="max-rent" placeholder="Max" min="0">
+        </div>
+      </div>
+
+      <!-- Amenities -->
+      <div class="filter-group">
+        <div class="filter-group__label">Amenities</div>
+        <div class="filter-options">
+          <label class="filter-option">
+            <input type="checkbox" id="filter-ac"> ❄️ AC Room
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" id="filter-food"> 🍽️ Food Included
+          </label>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block" onclick="applyFilters()">Apply Filters</button>
+    </aside>
+
+    <!-- RESULTS -->
+    <main>
+      <!-- Search Bar -->
+      <div class="explore-search">
+        <svg width="18" height="18" fill="none" stroke="var(--gray-400)" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input type="text" id="search-input" placeholder="Search by name, city, college..." oninput="debounceSearch()">
+      </div>
+
+      <!-- Active Filter Chips -->
+      <div class="active-filters" id="active-filters"></div>
+
+      <!-- Results Header -->
+      <div class="results-header">
+        <div class="results-count" id="results-count">Loading...</div>
+        <select class="sort-select" id="sort-select" onchange="applyFilters()">
+          <option value="">Sort: Newest First</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+        </select>
+      </div>
+
+      <!-- Properties Grid -->
+      <div class="properties-grid" id="properties-grid">
+        <div class="loading-state" style="grid-column:1/-1">
+          <div class="spinner"></div>
+          <span>Searching properties...</span>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer" style="margin-top:4rem;">
+  <div class="container">
+    <div class="footer__bottom">
+      <span>© 2024 StayFinder. All rights reserved.</span>
+      <a href="index.html" style="color: var(--gray-500);">← Back to Home</a>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  let searchTimer = null;
+  let currentFilters = {};
+
+  // Read URL params on page load
+  function readURLParams() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('city')) {
+      document.getElementById('search-input').value = params.get('city');
+      currentFilters.city = params.get('city');
+    }
+    if (params.get('search')) {
+      document.getElementById('search-input').value = params.get('search');
+      currentFilters.search = params.get('search');
+    }
+    if (params.get('type')) {
+      const radio = document.querySelector(`input[name="type"][value="${params.get('type')}"]`);
+      if (radio) radio.checked = true;
+      currentFilters.type = params.get('type');
+    }
+    if (params.get('gender')) {
+      const radio = document.querySelector(`input[name="gender"][value="${params.get('gender')}"]`);
+      if (radio) radio.checked = true;
+      currentFilters.genderPreference = params.get('gender');
+    }
+  }
+
+  function getFilters() {
+    const filters = {};
+    const search = document.getElementById('search-input').value.trim();
+    if (search) filters.search = search;
+
+    const gender = document.querySelector('input[name="gender"]:checked')?.value;
+    if (gender) filters.genderPreference = gender;
+
+    const type = document.querySelector('input[name="type"]:checked')?.value;
+    // Note: type filter handled on frontend for now (backend can support it too)
+
+    const sharing = document.querySelector('input[name="sharing"]:checked')?.value;
+    if (sharing) filters.sharingType = sharing;
+
+    const minRent = document.getElementById('min-rent').value;
+    const maxRent = document.getElementById('max-rent').value;
+    if (minRent) filters.minRent = minRent;
+    if (maxRent) filters.maxRent = maxRent;
+
+    if (document.getElementById('filter-ac').checked) filters.hasAC = true;
+    if (document.getElementById('filter-food').checked) filters.hasFood = true;
+
+    const sort = document.getElementById('sort-select').value;
+    if (sort) filters.sortBy = sort;
+
+    return filters;
+  }
+
+  async function loadProperties(filters = {}) {
+    const grid = document.getElementById('properties-grid');
+    const countEl = document.getElementById('results-count');
+    grid.innerHTML = `<div class="loading-state" style="grid-column:1/-1"><div class="spinner"></div><span>Searching...</span></div>`;
+
+    try {
+      const data = await propertyAPI.getAll(filters);
+      let properties = data.properties;
+
+      // Client-side type filter (simple, could also do server-side)
+      const selectedType = document.querySelector('input[name="type"]:checked')?.value;
+      if (selectedType) {
+        properties = properties.filter(p => p.type === selectedType);
+      }
+
+      countEl.innerHTML = `<strong>${properties.length}</strong> properties found`;
+
+      if (properties.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1">
+            <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <h3>No Properties Found</h3>
+            <p>Try adjusting your filters or search term.</p>
+            <button class="btn btn-secondary" onclick="clearAllFilters()">Clear Filters</button>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = properties.map(p => buildPropertyCard(p)).join('');
+    } catch (error) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+          <h3>Connection Error</h3>
+          <p>${error.message}</p>
+        </div>`;
+    }
+  }
+
+  function applyFilters() {
+    const filters = getFilters();
+    loadProperties(filters);
+  }
+
+  function debounceSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(applyFilters, 500);
+  }
+
+  function clearAllFilters() {
+    document.getElementById('search-input').value = '';
+    document.querySelectorAll('input[name="gender"]')[0].checked = true;
+    document.querySelectorAll('input[name="type"]')[0].checked = true;
+    document.querySelectorAll('input[name="sharing"]')[0].checked = true;
+    document.getElementById('min-rent').value = '';
+    document.getElementById('max-rent').value = '';
+    document.getElementById('filter-ac').checked = false;
+    document.getElementById('filter-food').checked = false;
+    document.getElementById('sort-select').value = '';
+    loadProperties();
+  }
+
+  function toggleFilters() {
+    document.getElementById('filter-panel').classList.toggle('show');
+  }
+
+  // Show filter toggle button on mobile
+  if (window.innerWidth <= 768) {
+    document.getElementById('filter-toggle-btn').style.display = 'flex';
+  }
+
+  // Run on load
+  readURLParams();
+  applyFilters();
+
+  // Filter inputs trigger reload
+  document.querySelectorAll('input[name="gender"], input[name="type"], input[name="sharing"]').forEach(el => {
+    el.addEventListener('change', applyFilters);
+  });
+  document.getElementById('filter-ac').addEventListener('change', applyFilters);
+  document.getElementById('filter-food').addEventListener('change', applyFilters);
+</script>
+</body>
+</html>
