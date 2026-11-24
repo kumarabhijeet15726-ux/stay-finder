@@ -6,9 +6,6 @@ const connectDB = require('../backend/config/database');
 
 const app = express();
 
-// Connect DB (handles cached connections for serverless)
-connectDB();
-
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -18,6 +15,17 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, '..', 'backend', 'uploads')));
+
+// Middleware to ensure DB is connected before handling any request
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('DB connection failed in middleware:', err);
+    res.status(500).json({ success: false, message: 'Database connection failed: ' + err.message });
+  }
+});
 
 // Mount API routes
 app.use('/api/auth', require('../backend/routes/authRoutes'));
