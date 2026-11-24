@@ -47,8 +47,13 @@ const enquirySchema = new mongoose.Schema(
     // Status of the enquiry
     status: {
       type: String,
-      enum: ['pending', 'responded', 'closed'],
+      enum: ['pending', 'accepted', 'rejected'],
       default: 'pending',
+    },
+    // Optional owner response/note
+    ownerReply: {
+      type: String,
+      default: '',
     },
   },
   {

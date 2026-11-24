@@ -238,7 +238,7 @@
           <td>${e.property?.city || 'N/A'}, ${e.property?.locality || ''}</td>
           <td>${e.property?.monthlyRent ? '₹' + e.property.monthlyRent.toLocaleString() : 'N/A'}</td>
           <td>${formatDate(e.createdAt)}</td>
-          <td><span class="badge badge-${e.status === 'pending' ? 'pending' : 'approved'}">${e.status}</span></td>
+          <td><span class="badge badge-${e.status === 'accepted' ? 'approved' : e.status === 'rejected' ? 'rejected' : 'pending'}">${e.status}</span></td>
         </tr>`).join('');
     } catch (e) {
       tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">${e.message}</td></tr>`;

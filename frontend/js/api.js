@@ -68,6 +68,7 @@ const apiRequest = async (endpoint, method = 'GET', body = null, isFormData = fa
 const authAPI = {
   register: (userData) => apiRequest('/auth/register', 'POST', userData),
   login: (credentials) => apiRequest('/auth/login', 'POST', credentials),
+  googleLogin: (data) => apiRequest('/auth/google', 'POST', data),
   getProfile: () => apiRequest('/auth/profile'),
   updateProfile: (data) => apiRequest('/auth/profile', 'PUT', data),
 };
@@ -102,6 +103,7 @@ const enquiryAPI = {
   submit: (data) => apiRequest('/enquiries', 'POST', data),
   getMyEnquiries: () => apiRequest('/enquiries/my-enquiries'),
   getOwnerEnquiries: () => apiRequest('/enquiries/owner-enquiries'),
+  updateStatus: (id, status, ownerReply = '') => apiRequest(`/enquiries/${id}/status`, 'PATCH', { status, ownerReply }),
 };
 
 // ============================================

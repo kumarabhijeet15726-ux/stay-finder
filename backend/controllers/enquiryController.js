@@ -59,6 +59,39 @@ const getOwnerEnquiries = async (req, res) => {
   }
 };
 
+// ---- UPDATE ENQUIRY STATUS (owner accepts or rejects) ----
+// PATCH /api/enquiries/:id/status (owner only)
+const updateEnquiryStatus = async (req, res) => {
+  try {
+    const { status, ownerReply } = req.body;
+    if (!['accepted', 'rejected'].includes(status)) {
+      return res.status(400).json({ success: false, message: "Status must be 'accepted' or 'rejected'." });
+    }
+
+    const enquiry = await Enquiry.findById(req.params.id);
+    if (!enquiry) {
+      return res.status(404).json({ success: false, message: 'Enquiry not found.' });
+    }
+
+    // Verify the logged-in owner is the recipient of this enquiry
+    if (enquiry.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Access denied. You can only respond to your own enquiries.' });
+    }
+
+    enquiry.status = status;
+    if (ownerReply) enquiry.ownerReply = ownerReply;
+    await enquiry.save();
+
+    res.json({
+      success: true,
+      message: `Enquiry ${status} successfully!`,
+      enquiry,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // ---- GET ALL ENQUIRIES (admin) ----
 // GET /api/enquiries (admin)
 const getAllEnquiries = async (req, res) => {
@@ -75,4 +108,4 @@ const getAllEnquiries = async (req, res) => {
   }
 };
 
-module.exports = { submitEnquiry, getMyEnquiries, getOwnerEnquiries, getAllEnquiries };
+module.exports = { submitEnquiry, getMyEnquiries, getOwnerEnquiries, updateEnquiryStatus, getAllEnquiries };

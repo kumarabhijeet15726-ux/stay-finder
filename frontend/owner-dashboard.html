@@ -175,10 +175,11 @@
               <th>Message</th>
               <th>Date</th>
               <th>Status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="enq-body">
-            <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray-400)">Loading...</td></tr>
+            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--gray-400)">Loading...</td></tr>
           </tbody>
         </table>
       </div>
@@ -425,7 +426,7 @@
       const data = await enquiryAPI.getOwnerEnquiries();
       const enqs = data.enquiries;
       if (enqs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray-400);">No enquiries received yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--gray-400);">No enquiries received yet.</td></tr>`;
         return;
       }
       tbody.innerHTML = enqs.map(e => `
@@ -435,13 +436,34 @@
             <div style="font-size:0.75rem;color:var(--gray-500);">${e.email}</div>
           </td>
           <td style="font-weight:500;">${e.property?.name || 'N/A'}</td>
-          <td>${e.phone}</td>
+          <td><a href="tel:${e.phone}" style="color:var(--primary); font-weight:600;">📞 ${e.phone}</a></td>
           <td style="font-size:0.8rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${e.message}">${e.message}</td>
           <td>${formatDate(e.createdAt)}</td>
-          <td><span class="badge badge-${e.status === 'pending' ? 'pending' : 'approved'}">${e.status}</span></td>
+          <td><span class="badge badge-${e.status === 'accepted' ? 'approved' : e.status === 'rejected' ? 'rejected' : 'pending'}">${e.status}</span></td>
+          <td>
+            ${e.status === 'pending' ? `
+              <div style="display:flex; gap:0.4rem;">
+                <button class="btn btn-sm btn-success" onclick="respondEnquiry('${e._id}', 'accepted', this)">Accept</button>
+                <button class="btn btn-sm btn-danger" onclick="respondEnquiry('${e._id}', 'rejected', this)">Reject</button>
+              </div>
+            ` : `<span style="font-size:0.75rem; color:var(--gray-400); font-weight:600;">Completed</span>`}
+          </td>
         </tr>`).join('');
     } catch (e) {
-      tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">${e.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="color:red;text-align:center;">${e.message}</td></tr>`;
+    }
+  }
+
+  async function respondEnquiry(id, status, btn) {
+    btn.disabled = true;
+    try {
+      await enquiryAPI.updateStatus(id, status);
+      showToast(`Enquiry ${status}!`, status === 'accepted' ? 'success' : 'info');
+      loadEnquiries();
+      loadStats();
+    } catch (err) {
+      showToast(err.message, 'error');
+      btn.disabled = false;
     }
   }
 

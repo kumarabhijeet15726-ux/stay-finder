@@ -24,9 +24,15 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
+      required: function() {
+        return !this.googleId; // Required only if not signing in with Google
+      },
       minlength: [6, 'Password must be at least 6 characters'],
       select: false, // Don't send password in queries by default
+    },
+    googleId: {
+      type: String,
+      default: null,
     },
     phone: {
       type: String,
@@ -67,8 +73,8 @@ const userSchema = new mongoose.Schema(
 // ---- MIDDLEWARE: Hash password before saving ----
 // This runs automatically every time a user is saved
 userSchema.pre('save', async function (next) {
-  // Only hash if password was actually changed
-  if (!this.isModified('password')) return next();
+  // Only hash if password was actually changed and is present
+  if (!this.isModified('password') || !this.password) return next();
 
   // bcrypt with salt rounds = 10 (higher = more secure but slower)
   this.password = await bcrypt.hash(this.password, 10);

@@ -147,4 +147,69 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getProfile, updateProfile };
+// ---- GOOGLE AUTH LOGIN / REGISTER ----
+// POST /api/auth/google
+const googleLogin = async (req, res) => {
+  try {
+    const { credential, email, name, role = 'student' } = req.body;
+
+    let userEmail = email;
+    let userName = name;
+    let googleSub = null;
+
+    // If a Google JWT credential (ID Token) is provided, decode payload
+    if (credential) {
+      try {
+        const parts = credential.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+          userEmail = payload.email || userEmail;
+          userName = payload.name || userName;
+          googleSub = payload.sub || null;
+        }
+      } catch (err) {
+        console.warn('Could not decode Google token payload, using fallback fields', err);
+      }
+    }
+
+    if (!userEmail) {
+      return res.status(400).json({ success: false, message: 'Email is required from Google account.' });
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ email: userEmail.toLowerCase() });
+
+    if (!user) {
+      // Create new user authenticated via Google
+      user = await User.create({
+        name: userName || userEmail.split('@')[0],
+        email: userEmail.toLowerCase(),
+        role: ['student', 'owner'].includes(role) ? role : 'student',
+        googleId: googleSub || `google_${Date.now()}`,
+      });
+    } else if (!user.isActive) {
+      return res.status(401).json({ success: false, message: 'Your account has been deactivated.' });
+    }
+
+    const token = generateToken(user._id);
+
+    res.json({
+      success: true,
+      message: 'Signed in with Google successfully!',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone,
+        college: user.college,
+      },
+    });
+  } catch (error) {
+    console.error('Google Auth Error:', error);
+    res.status(500).json({ success: false, message: 'Google authentication failed.' });
+  }
+};
+
+module.exports = { register, login, googleLogin, getProfile, updateProfile };
