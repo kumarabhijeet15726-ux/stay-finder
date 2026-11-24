@@ -133,4 +133,4 @@ propertySchema.index({ city: 1, locality: 1 });
 propertySchema.index({ status: 1 });
 propertySchema.index({ monthlyRent: 1 });
 
-module.exports = mongoose.model('Property', propertySchema);
+module.exports = mongoose.models.Property || mongoose.model('Property', propertySchema);

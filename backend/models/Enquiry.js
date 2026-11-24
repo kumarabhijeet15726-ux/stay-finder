@@ -61,4 +61,4 @@ const enquirySchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('Enquiry', enquirySchema);
+module.exports = mongoose.models.Enquiry || mongoose.model('Enquiry', enquirySchema);

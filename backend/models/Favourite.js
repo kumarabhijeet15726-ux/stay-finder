@@ -26,4 +26,4 @@ const favouriteSchema = new mongoose.Schema(
 // Prevent duplicate favourites (same student can't save same property twice)
 favouriteSchema.index({ student: 1, property: 1 }, { unique: true });
 
-module.exports = mongoose.model('Favourite', favouriteSchema);
+module.exports = mongoose.models.Favourite || mongoose.model('Favourite', favouriteSchema);
