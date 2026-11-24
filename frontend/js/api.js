@@ -4,7 +4,10 @@
 // ============================================
 
 // Base URL of your backend server
-const API_BASE = 'http://localhost:5000/api';
+// When deployed on Vercel, use relative '/api', else localhost
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5000/api'
+  : '/api';
 
 // ---- Get stored JWT token from localStorage ----
 const getToken = () => localStorage.getItem('sf_token');
