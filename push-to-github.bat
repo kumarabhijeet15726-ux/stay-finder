@@ -5,9 +5,11 @@ echo     Pushing StayFinder to your GitHub repository
 echo ===================================================
 echo.
 cd /d "%~dp0"
-"..\PortableGit\cmd\git.exe" push -u origin main
+git push -u origin main
 echo.
 echo ===================================================
-echo Done! If asked to log in, complete the browser login.
+echo If asked for credentials:
+echo   Username: kumarabhijeet15726-ux
+echo   Password: Enter your GitHub Personal Access Token
 echo ===================================================
 pause
