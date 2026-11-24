@@ -14,16 +14,49 @@
     .image-preview-box {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 0.5rem;
+      gap: 0.75rem;
       margin-top: 0.75rem;
     }
 
-    .image-preview-box img {
-      width: 100%;
-      height: 80px;
-      object-fit: cover;
+    .image-preview-item {
+      position: relative;
       border-radius: var(--radius-sm);
-      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      border: 1.5px solid var(--gray-200);
+      aspect-ratio: 4/3;
+      background: var(--gray-100);
+    }
+
+    .image-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .preview-remove-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      background: rgba(220, 38, 38, 0.9);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+      border: 1px solid white;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      transition: all 0.2s;
+    }
+
+    .preview-remove-btn:hover {
+      background: #b91c1c;
+      transform: scale(1.15);
     }
 
     .amenity-checklist {
@@ -490,28 +523,66 @@
     }
   }
 
+  let selectedImages = []; // Stores Array of File objects
+
   function openAddPropertyModal() {
+    selectedImages = [];
+    document.getElementById('property-form').reset();
+    renderPreviews();
+    document.getElementById('form-alert').innerHTML = '';
     document.getElementById('add-property-modal').classList.add('active');
   }
 
   function closeModal() {
     document.getElementById('add-property-modal').classList.remove('active');
+    selectedImages = [];
     document.getElementById('property-form').reset();
-    document.getElementById('image-previews').innerHTML = '';
+    renderPreviews();
     document.getElementById('form-alert').innerHTML = '';
   }
 
   function previewImages(input) {
-    const preview = document.getElementById('image-previews');
-    preview.innerHTML = '';
-    Array.from(input.files).slice(0, 10).forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        preview.appendChild(img);
+    if (!input.files || input.files.length === 0) return;
+
+    Array.from(input.files).forEach(file => {
+      if (selectedImages.length < 10) {
+        selectedImages.push(file);
+      }
+    });
+
+    input.value = ''; // Clear file input so more can be added
+    renderPreviews();
+  }
+
+  function removeImage(index) {
+    selectedImages.splice(index, 1);
+    renderPreviews();
+  }
+
+  function renderPreviews() {
+    const previewBox = document.getElementById('image-previews');
+    previewBox.innerHTML = '';
+
+    selectedImages.forEach((file, index) => {
+      const item = document.createElement('div');
+      item.className = 'image-preview-item';
+
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'preview-remove-btn';
+      removeBtn.innerHTML = '✕';
+      removeBtn.title = 'Remove this image';
+      removeBtn.onclick = (e) => {
+        e.stopPropagation();
+        removeImage(index);
       };
-      reader.readAsDataURL(file);
+
+      item.appendChild(img);
+      item.appendChild(removeBtn);
+      previewBox.appendChild(item);
     });
   }
 
@@ -537,10 +608,9 @@
       formData.set('hasAC', hasAC.toString());
       formData.set('hasFood', hasFood.toString());
 
-      // Attach images
-      const imageInput = document.getElementById('property-images');
+      // Attach images from our custom selectedImages array
       formData.delete('images');
-      Array.from(imageInput.files).forEach(file => formData.append('images', file));
+      selectedImages.forEach(file => formData.append('images', file));
 
       await propertyAPI.create(formData);
       showToast('Property submitted! Awaiting admin approval.', 'success');

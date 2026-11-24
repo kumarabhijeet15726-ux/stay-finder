@@ -1115,4 +1115,19 @@ tbody tr:hover td { background: var(--gray-50); }
   .container { padding: 0 var(--space-4); }
   .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr; }
   h1 { font-size: 1.75rem; }
+
+  /* Mobile Navbar Actions & Logout */
+  .navbar__inner {
+    gap: 0.5rem;
+  }
+  .navbar__actions {
+    gap: 0.35rem;
+  }
+  .navbar__user-name {
+    display: none;
+  }
+  #logout-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+  }
 }

@@ -277,7 +277,7 @@
   function renderProperty() {
     const hasImages = property.images && property.images.length > 0;
     const mainImg = hasImages
-      ? `<img src="http://localhost:5000${property.images[0]}" alt="${property.name}" id="main-image">`
+      ? `<img src="${getImageUrl(property.images[0])}" alt="${property.name}" id="main-image">`
       : `<div class="img-placeholder" style="height:100%;">
            <svg width="60" height="60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg>
            <span>No Images Available</span>
@@ -286,7 +286,7 @@
     const thumbs = hasImages
       ? property.images.map((img, i) =>
           `<div class="gallery__thumb ${i===0?'active':''}" onclick="switchImage(${i})">
-             <img src="http://localhost:5000${img}" alt="Photo ${i+1}">
+             <img src="${getImageUrl(img)}" alt="Photo ${i+1}">
            </div>`
         ).join('')
       : '';

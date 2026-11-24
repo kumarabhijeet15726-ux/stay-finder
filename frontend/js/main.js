@@ -48,19 +48,31 @@ const setupNavbar = () => {
   if (!actionsEl) return;
 
   if (user) {
-    // Show user avatar and dashboard link
+    // Show user avatar, dashboard link, and dedicated logout button
     actionsEl.innerHTML = `
-      <a href="${getDashboardLink(user.role)}" class="btn btn-secondary btn-sm">Dashboard</a>
-      <div class="navbar__user" id="user-menu-btn">
+      <a href="${getDashboardLink(user.role)}" class="btn btn-secondary btn-sm" id="nav-dash-link">Dashboard</a>
+      <div class="navbar__user" id="user-menu-btn" onclick="window.location.href='${getDashboardLink(user.role)}'">
         <div class="navbar__user-avatar">${user.name.charAt(0).toUpperCase()}</div>
-        <span>${user.name.split(' ')[0]}</span>
+        <span class="navbar__user-name">${user.name.split(' ')[0]}</span>
       </div>
-      <button class="btn btn-sm" id="logout-btn" onclick="handleLogout()" style="color:var(--gray-600)">
-        Logout
+      <button class="btn btn-danger btn-sm" id="logout-btn" onclick="handleLogout()" style="display:inline-flex; align-items:center; gap:0.25rem;">
+        🚪 <span>Logout</span>
       </button>
     `;
+
+    // Also inject mobile logout in navbar dropdown if mobile menu toggle exists
+    const linksEl = document.getElementById('navbar-links');
+    if (linksEl && !document.getElementById('mobile-logout-link')) {
+      const li = document.createElement('li');
+      li.id = 'mobile-logout-link';
+      li.innerHTML = `<a href="javascript:void(0)" onclick="handleLogout()" class="navbar__link" style="color:#EF4444; font-weight:600;">🚪 Logout (${user.name.split(' ')[0]})</a>`;
+      linksEl.appendChild(li);
+    }
   } else {
     actionsEl.innerHTML = `
+      <a href="login.html?role=owner" class="btn btn-sm" style="color:#D97706; font-weight:600;">
+        🏠 Owner Login
+      </a>
       <a href="login.html" class="btn btn-secondary btn-sm">Log In</a>
       <a href="register.html" class="btn btn-primary btn-sm">Sign Up</a>
     `;
@@ -94,13 +106,22 @@ const setupMobileMenu = () => {
   }
 };
 
+// Helper to get correct full or relative image URL
+const getImageUrl = (imgStr) => {
+  if (!imgStr) return null;
+  if (imgStr.startsWith('data:image') || imgStr.startsWith('http://') || imgStr.startsWith('https://')) {
+    return imgStr;
+  }
+  return imgStr.startsWith('/') ? imgStr : `/${imgStr}`;
+};
+
 // ============================================
 // PROPERTY CARD BUILDER
 // Returns HTML string for a property card
 // ============================================
 const buildPropertyCard = (property, isFavourited = false) => {
   const imgSrc = property.images && property.images.length > 0
-    ? `http://localhost:5000${property.images[0]}`
+    ? getImageUrl(property.images[0])
     : null;
 
   const genderClass = property.genderPreference.toLowerCase();

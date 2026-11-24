@@ -16,8 +16,15 @@ const createProperty = async (req, res) => {
       genderPreference, hasAC, hasFood, amenities, houseRules, contactNumber
     } = req.body;
 
-    // Collect uploaded image paths
-    const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    // Collect uploaded image paths (either disk filename or buffer dataURI)
+    const images = req.files ? req.files.map(file => {
+      if (file.filename) {
+        return `/uploads/${file.filename}`;
+      } else if (file.buffer) {
+        return `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+      }
+      return null;
+    }).filter(Boolean) : [];
 
     // Parse amenities if it comes as a JSON string
     let parsedAmenities = [];
