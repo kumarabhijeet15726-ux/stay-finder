@@ -415,7 +415,7 @@
 
     if (isAdminMode) {
       title.textContent = 'Admin Portal';
-      subtitle.innerHTML = 'Administrative access only. Enter master administrator credentials.';
+      subtitle.innerHTML = 'Administrative access only. <strong>Email:</strong> admin@stayfinder.com | <strong>Pass:</strong> Admin@123';
       tag.style.display = 'inline-block';
       tag.textContent = 'Admin Access';
       tag.style.background = '#DC2626';
@@ -428,6 +428,8 @@
       loginBtn.textContent = 'Sign In as Administrator';
       loginBtn.style.background = '#DC2626';
       loginBtn.style.borderColor = '#DC2626';
+      emailInput.value = 'admin@stayfinder.com';
+      document.getElementById('password').value = 'Admin@123';
       emailInput.placeholder = 'admin@stayfinder.com';
     } else {
       title.textContent = 'Sign In';
