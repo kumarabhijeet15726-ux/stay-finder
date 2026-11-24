@@ -114,7 +114,7 @@ const login = async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+    res.status(500).json({ success: false, message: error.message || 'Server error. Please try again.' });
   }
 };
 
