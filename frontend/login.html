@@ -340,8 +340,8 @@
       setTimeout(() => {
         if (data.user.role === 'admin') window.location.href = 'admin-dashboard.html';
         else if (data.user.role === 'owner') window.location.href = 'owner-dashboard.html';
-        else window.location.href = 'student-dashboard.html';
-      }, 800);
+        else window.location.href = 'index.html'; // Direct to Home Page for students
+      }, 700);
     } catch (error) {
       alertEl.innerHTML = `<div class="alert alert-error" style="margin-bottom:1rem;">❌ ${error.message}</div>`;
       btn.disabled = false;
@@ -408,8 +408,8 @@
       setTimeout(() => {
         if (data.user.role === 'admin') window.location.href = 'admin-dashboard.html';
         else if (data.user.role === 'owner') window.location.href = 'owner-dashboard.html';
-        else window.location.href = 'student-dashboard.html';
-      }, 800);
+        else window.location.href = 'index.html'; // Direct to Home Page for students
+      }, 700);
     } catch (err) {
       alertEl.innerHTML = `<div class="alert alert-error" style="margin-bottom:1rem;">❌ ${err.message}</div>`;
     }
@@ -445,8 +445,8 @@
               setTimeout(() => {
                 if (data.user.role === 'admin') window.location.href = 'admin-dashboard.html';
                 else if (data.user.role === 'owner') window.location.href = 'owner-dashboard.html';
-                else window.location.href = 'student-dashboard.html';
-              }, 800);
+                else window.location.href = 'index.html'; // Redirect student to Home Page
+              }, 700);
             } catch (err) {
               showToast(err.message, "error");
             }

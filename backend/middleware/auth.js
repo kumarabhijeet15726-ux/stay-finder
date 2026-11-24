@@ -26,7 +26,8 @@ const protect = async (req, res, next) => {
 
   try {
     // Verify the token using our secret key
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'stayfinder_super_secret_key_2024_change_this_in_production';
+    const decoded = jwt.verify(token, secret);
 
     // Find the user from the database using the ID stored in the token
     // We fetch fresh data from DB every time (don't trust the token data alone)

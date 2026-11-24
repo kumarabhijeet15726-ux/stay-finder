@@ -13,7 +13,8 @@ const connectDB = async () => {
   }
 
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+    const uri = process.env.MONGODB_URI || 'mongodb+srv://kumarabhijeet15726_db_user:qXNt3iI5lMEnqoSX@stayfinder.bemyvgp.mongodb.net/stayfinder?retryWrites=true&w=majority';
+    const conn = await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

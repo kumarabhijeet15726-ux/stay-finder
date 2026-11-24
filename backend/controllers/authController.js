@@ -8,9 +8,10 @@ const jwt = require('jsonwebtoken');
 
 // ---- HELPER: Generate JWT Token ----
 const generateToken = (id) => {
+  const secret = process.env.JWT_SECRET || 'stayfinder_super_secret_key_2024_change_this_in_production';
   return jwt.sign(
-    { id }, // Payload: only store the user's ID in the token
-    process.env.JWT_SECRET,
+    { id },
+    secret,
     { expiresIn: process.env.JWT_EXPIRE || '7d' }
   );
 };
